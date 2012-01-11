@@ -1,3 +1,8 @@
+/*
+* Author and copyright: Lars Kristian Roland
+* License: See README file distributed with this software. 
+*/
+
 #include "msp430g2553.h"
 #include "spi_usci_CC1101_hal.h"
 #include "various.h"

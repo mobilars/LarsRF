@@ -1,0 +1,5 @@
+This is a very basic and simple RF library for the MSP430 on Launchpad, for working with the Launchpad RF Booster Pack. 
+
+It is not based on any other source and therefore doesn't have any open-source issues. 
+
+It is currently licensed under GPL, but I may change the license. 

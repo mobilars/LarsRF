@@ -1,3 +1,7 @@
+/*
+* Author and copyright: Lars Kristian Roland
+* License: See README file distributed with this software. 
+*/
 
 #ifndef __RADIO_COMMANDS_H
 #define __RADIO_COMMANDS_H
