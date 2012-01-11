@@ -5,6 +5,7 @@
 * Based on a work at github.com.
 * Permissions beyond the scope of this license may be available at http://lars.roland.bz/.
 */
+
 #include <msp430.h>
 
 #include "commands.h"

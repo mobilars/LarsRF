@@ -24,5 +24,3 @@ void SPI_read_burst(uint8 addr, uint8 *buffer, uint8 count);
 void SPI_strobe( uint8 strobe );
 uint8 SPI_read_status( uint8 addr );
 void SPI_init( void );
-//void SPI_write( unsigned char address, unsigned char * rfBuffer, unsigned char count );
-//void SPI_read( unsigned char addr, unsigned char * rfBuffer, unsigned char count );

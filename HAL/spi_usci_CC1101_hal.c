@@ -23,28 +23,25 @@ void SPI_init( void )
   
   UCB0CTL1 |= UCSWRST;
   
-  //P1OUT = BIT3;                     // Pull up for 1.3
-  //P1DIR = BIT5;                     //
   P1SEL = BIT5 + BIT6 + BIT7;
   P1SEL2 = BIT5 + BIT6 + BIT7;
-  //P1REN = BIT3;
     
-  P2OUT |= BIT7;
-  P2DIR |= BIT7;
-  P2SEL = 0x00;
+  P2OUT |= BIT7; // CSn
+  P2DIR |= BIT7; // CSn
+  P2SEL = 0x00;  // Make sure CSn works instead of crystal
   
   UCB0CTL0 |= UCCKPH | UCMST | UCSYNC | UCMSB;
   UCB0CTL1 |= UCSSEL_2;                     // SMCLK
   UCB0BR0 = 0x01; 
   UCB0BR1 = 0x00;                              //
-  //UCB0MCTL = 0;                             // No modulation
+  
   UCB0CTL1 &= ~UCSWRST;                     // **Initialize USCI state machine**
   
-  //IE2 |= UCB0RXIE;                          // Enable USCI0 RX interrupt
+  //IE2 |= UCB0RXIE;                        // Enable USCI0 RX interrupt
 
   __delay_cycles(75);                 // Wait for slave to initialize
 
-  //_BIS_SR(GIE); 
+  //_BIS_SR(GIE); // Enable interrupts
 
 }
 
