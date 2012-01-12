@@ -6,13 +6,15 @@ with BSD-license that were more compatible across multiple chips. This library i
 http://www.ti.com/general/docs/litabsmultiplefilelist.tsp?literatureNumber=slaa325a 
   
 I have now deleted my original files, and have included the TI-files here as a
-library under the directory /ti (so I'm not the copyright-holder of these files,
-and not the original author). They are licensed under BSD. Please see the headers
-of the files for more information. I have made some modifications to the files
-to make it work with the Launchpad and MSP430G2553
+library under the directory /ti (so I'm not the copyright-holder of the files in
+the /ti-directory, and not the original author). 
+
+All files are licensed under BSD, including both the TI-files and my own. 
+Please see the headers of the files for more information. I have made some 
+modifications to the TI-files to make it work with the Launchpad and MSP430G2553
 
 I am going to make a few test-apps that I will put under the directory /apps
-These test-apps are based on test-code from TI. 
+These test-apps are based on test-code from TI, and are also available as BSD. 
 
 Thanks to CorB for testing and helping out. 
 

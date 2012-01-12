@@ -55,6 +55,7 @@
 #include "include.h"
 #include "TI_CC_spi.h"
 
+/*
 //------------------------------------------------------------------------------
 //  void TI_CC_SPISetup(void)
 //
@@ -2340,3 +2341,4 @@ void TI_CC_PowerupResetCCxxxx(void)
 }
 #endif
 
+*/
