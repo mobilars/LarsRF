@@ -92,12 +92,16 @@ __interrupt void Port2_ISR(void)
     if (RFReceivePacket(rxBuffer,&len))     // Fetch packet from CCxxxx
     TI_CC_LED_PxOUT ^= rxBuffer[1];         // Toggle LEDs according to pkt data
     
-    // Send ACK
-    // Build packet
-    txBuffer[0] = 11;                        // Packet length
-    txBuffer[1] = 0x01;                     // Packet address
-    txBuffer[2] = TI_CC_LED1;
-    RFSendPacket(txBuffer, 12);              // Send value over RF
+    if (rxBuffer[2] != 0x00) {
+      __delay_cycles(500000);
+      // Send ACK
+      // Build packet
+      txBuffer[0] = 11;                        // Packet length
+      txBuffer[1] = 0x01;                     // Packet address
+      txBuffer[2] = 0xFF;
+      txBuffer[3] = 0x00;
+      RFSendPacket(txBuffer, 12);              // Send value over RF
+    }
   }
 
   TI_CC_GDO0_PxIFG &= ~TI_CC_GDO0_PIN;      // After pkt RX, this flag is set.
