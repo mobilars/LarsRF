@@ -24,3 +24,6 @@ void RF_init();
 
 void RF_send_packet(uint8 *txBuffer, uint8 length);
 uint8 RF_receive_packet(uint8 *rxBuffer);
+
+uint8 RF_receive_packet_ack(uint8 *rxBuffer, uint8 *ackBuffer, uint8 acklength);
+uint8 RF_send_packet_ack(uint8 *txBuffer, uint8 length);

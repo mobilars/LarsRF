@@ -7,21 +7,8 @@
 */
 
 /*
-Hardware setup for this example:
 
-Put an LED with a 1Kohm resistor in series between VCC and P1.4. VCC is positive, 
-and the LED will light up when the P1.4 is low. 
-
-If you press the push-button, the chip will transmit. When it transmits, it
-will also flash the LED you installed above. 
-
-While not pressing the push-button, the chip will be trying to receive. On
-succesful RX, it will flash the LED you installed above. 
-
-Both chips have the same address and the same code. 
-
-This code is intended for msp430g2553 (or other USCI chips). The library won't work
-with the cheaper USI-based chips (yet). 
+This is not yet a working example. Leave it out of your compilation. 
 
 */
 
@@ -41,8 +28,11 @@ int main(void)
   WDTCTL = WDTPW + WDTHOLD;
   
   P1DIR |= BIT4;            // P1.4 set as output
+  P1DIR |= BIT1;            // P1.1 set as output
   P1REN = BIT3;             // Pullup for the button
   P1OUT |= BIT3;            // Pullup for the button
+  P1OUT |= BIT1;
+  P2DIR |= BIT2;
   
   blink();
   blink();
@@ -52,8 +42,16 @@ int main(void)
         
   RF_reset();
   RF_SIDLE;
-  RF_init();
+  RF_init_slow();
 
+  P1IE |= BIT3;                             // P1.4 interrupt enabled
+  P1IES |= BIT3;                            // P1.4 Hi/lo edge
+  P1IFG &= ~BIT3;                           // P1.4 IFG cleared
+
+  _BIS_SR(GIE);                 // Enter LPM4 w/interrupt
+  
+  while (1);
+  /*
   while (1) {
     if ((P1IN & BIT3) == 0) {
       send_packets();
@@ -61,7 +59,7 @@ int main(void)
     else {
       receive_packets();
     }
-  }
+  }*/
 }
 
 void check_RSSI()
@@ -82,10 +80,14 @@ void check_RSSI()
 
 void receive_packets()
 {
+  SPI_strobe(SFTX);
+  SPI_strobe(SFRX);
+  
   uint8 buffer[20];
+  uint8 ackBuffer[10] = {21,22,23,24,25,26,27,28,30,31};
   P1OUT |= BIT4;
   
-  uint8 length = RF_receive_packet(buffer);
+  uint8 length = RF_receive_packet_ack(buffer, ackBuffer, 2);
   if (length > 0) {
       blink();
   }
@@ -98,12 +100,20 @@ void receive_packets()
 
 void send_packets()
 {
+  //SPI_strobe(SFTX);
+  //SPI_strobe(SFRX);
+  
   uint8 buffer[20] = {1,2,3,4,5,6,7,8,10,11};
   
-  RF_send_packet(buffer, 10);
-  blink();
-  __delay_cycles(1000);
-
+    if ((P1IN & BIT3) == 0) {
+      uint8 length = RF_send_packet_ack(buffer, 8);
+      if (length > 0) {
+        blink();
+      }
+    }
+    
+    // Need to add some delay... Dont' send too often. It's low baud rate
+    //__delay_cycles(1000000);
 }
 
 void blink()
@@ -112,4 +122,12 @@ void blink()
       __delay_cycles(10000); 
       P1OUT |= BIT4; // off
       __delay_cycles(10000); 
+}
+
+// Port 1 interrupt service routine
+#pragma vector=PORT1_VECTOR
+__interrupt void Port_1(void)
+{
+   P1IFG &= ~BIT3;
+  send_packets();
 }

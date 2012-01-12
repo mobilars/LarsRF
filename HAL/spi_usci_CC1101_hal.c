@@ -47,7 +47,7 @@ void SPI_init( void )
 
 uint8 SPI_cmd( uint8 value )
 {
-  IFG2 &= ~UCB0RXIFG; // reset the RX flag 
+  IFG2 &= ~UCB0RXIFG; // reset the RX fifo 
   UCB0TXBUF = value;                      
   while(!(IFG2 & UCB0RXIFG));
   return UCB0RXBUF;
@@ -91,28 +91,28 @@ uint8 SPI_write_single( uint8 addr, uint8 value )
 
 void SPI_write_burst(uint8 addr, uint8 *buffer, uint8 count)
 {
-	uint8 i;
-	CS_low; 
-	SPI_cmd( addr | WRITE | BURST );
-	for(i=0;i<count;i++)
-	{
-	  SPI_cmd(buffer[i]);
-          __delay_cycles(10); 
-	}
-	CS_high;
+  uint8 i;
+  CS_low; 
+  SPI_cmd( addr | WRITE | BURST );
+  for(i=0;i<count;i++)
+  {
+    SPI_cmd(buffer[i]);
+    __delay_cycles(10); 
+  }
+  CS_high;
 }
 
 void SPI_read_burst(uint8 addr, uint8 *buffer, uint8 count)
 {
-	uint8 i;
-	CS_low; 
+  uint8 i;
+  CS_low; 
 
-	SPI_cmd( addr | READ | BURST );
-	for(i=0;i<count;i++)
-	{
-	  buffer[i] = SPI_cmd( 0x00 );
-	}
-	CS_high;
+  SPI_cmd( addr | READ | BURST );
+  for(i=0;i<count;i++)
+  {
+    buffer[i] = SPI_cmd( 0x00 );
+  }
+  CS_high;
 }
 
 /*

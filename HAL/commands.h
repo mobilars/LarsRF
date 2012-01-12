@@ -10,7 +10,6 @@
 #define __RADIO_COMMANDS_H
 
 
-
 /* configuration registers */
 #define IOCFG2      0x00      /*  IOCFG2   - GDO2 output pin configuration  */
 #define IOCFG1      0x01      /*  IOCFG1   - GDO1 output pin configuration  */
