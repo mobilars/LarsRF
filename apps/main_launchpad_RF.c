@@ -1,5 +1,11 @@
-/* This file is licensed under BSD. It is originally copyright Texas Instruments, 
+/* 
+* This file is licensed under BSD. It is originally copyright Texas Instruments, 
 * but has been adapted by Lars Kristian Roland
+*/
+
+/*
+* Put an LED between P1.4 and GND (or VCC). Press the button on the other board,
+* and your LED should turn on and off. 
 */
 
 #include "../ti/include.h"
@@ -7,8 +13,8 @@
 extern char paTable[];
 extern char paTableLen;
 
-char txBuffer[4];
-char rxBuffer[4];
+char txBuffer[12];
+char rxBuffer[12];
 unsigned int i = 0;
 
 void main (void)
@@ -53,11 +59,19 @@ __interrupt void Port1_ISR (void)
   if(TI_CC_SW_PxIFG & TI_CC_SW1)
   {
     // Build packet
-    txBuffer[0] = 2;                        // Packet length
+    txBuffer[0] = 11;                        // Packet length
     txBuffer[1] = 0x01;                     // Packet address
     txBuffer[2] = TI_CC_LED1;
-    //(~TI_CC_SW_PxIFG << 1) & 0x02; // Load switch inputs
-    RFSendPacket(txBuffer, 3);              // Send value over RF
+    txBuffer[3] = 0x32;
+    txBuffer[4] = 0x33;
+    txBuffer[5] = 0x34;
+    txBuffer[6] = 0x35;
+    txBuffer[7] = 0x36;
+    txBuffer[8] = 0x37;
+    txBuffer[9] = 0x38;
+    txBuffer[10] = 0x39;
+    txBuffer[11] = 0x40;
+    RFSendPacket(txBuffer, 12);              // Send value over RF
     __delay_cycles(5000);                   // Switch debounce
   }
   TI_CC_SW_PxIFG &= ~(TI_CC_SW1);           // Clr flag that caused int
@@ -71,7 +85,7 @@ __interrupt void Port2_ISR(void)
     // if GDO fired
   if(TI_CC_GDO0_PxIFG & TI_CC_GDO0_PIN)
   {
-    char len=2;                             // Len of pkt to be RXed (only addr
+    char len=11;                            // Len of pkt to be RXed (only addr
                                             // plus data; size byte not incl b/c
                                             // stripped away within RX function)
     if (RFReceivePacket(rxBuffer,&len))     // Fetch packet from CCxxxx
