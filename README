@@ -1,8 +1,17 @@
-This is a very basic and simple RF library for the MSP430 on Launchpad, for working with the Launchpad RF Booster Pack. 
+This is a simple RF library for TI Launchpad w / RF Boosterpack running MSP430G2553.
 
-It is not based on any other source and therefore doesn't have any open-source issues. 
+I started writing my own library, but then I was told of a TI-library
+with BSD-license that were more compatible across multiple chips. This library is at:
 
-LarsRF by Lars Kristian Roland is licensed under a Creative Commons Attribution-ShareAlike 3.0 Unported License.
-Based on a work at github.com.
+http://www.ti.com/general/docs/litabsmultiplefilelist.tsp?literatureNumber=slaa325a 
+  
+I have now deleted my original files, and have included the TI-files here as a
+library under the directory /ti (so I'm not the copyright-holder of these files,
+and not the original author). They are licensed under BSD. Please see the headers
+of the files for more information. I have made some modifications to the files
+to make it work with the Launchpad and MSP430G2553
 
-Permissions beyond the scope of this license may be available at http://lars.roland.bz/ 
+I am going to make a few test-apps that I will put under the directory /apps
+These test-apps are based on test-code from TI. 
+
+Thanks to CorB for testing and helping out. 
