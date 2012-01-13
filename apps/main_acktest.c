@@ -11,6 +11,7 @@
 
 #include "../ti/include.h"
 #include "../hal/uart.h"
+#include <string.h>
 
 extern char paTable[];
 extern char paTableLen;
@@ -65,7 +66,7 @@ __interrupt void Port1_ISR (void)
   // If Switch was pressed
   if(TI_CC_SW_PxIFG & TI_CC_SW1)
   {
-    uartWriteString("TX \r\n");
+    uartWriteString("TX PKT\r\n");
   
     // Build packet
     txBuffer[0] = 11;                        // Packet length
@@ -101,23 +102,25 @@ __interrupt void Port2_ISR(void)
     {   
         // Fetch packet from CCxxxx
         TI_CC_LED_PxOUT ^= rxBuffer[1];         // Toggle LEDs according to pkt data
-        
-        uartWriteString("RX \r\n");
-        
-        if (rxBuffer[3] != 0x00) 
+           
+        if (rxBuffer[1] == 0xFF) 
         {
-         
+          uartWriteString("RX ACK\r\n");
+        }
+        else 
+        {
           __delay_cycles(500000);
           // Send ACK
           // Build packet
-          txBuffer[0] = 11;                        // Packet length
+          txBuffer[0] = 3;                        // Packet length
           txBuffer[1] = 0x01;                     // Packet address
           txBuffer[2] = 0xFF;
           txBuffer[3] = 0x00;
-          RFSendPacket(txBuffer, 12);              // Send value over RF
-          
-          uartWriteString("TX \r\n");
+          RFSendPacket(txBuffer, 4);              // Send value over RF
+          uartWriteString("RX PKT\r\n");
+          uartWriteString("TX ACK\r\n");
         }
+        
      }
   }
 
