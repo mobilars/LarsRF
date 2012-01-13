@@ -10,7 +10,6 @@
 */
 
 #include "../ti/include.h"
-#include "../hal/uart.h"
 
 extern char paTable[];
 extern char paTableLen;
@@ -26,8 +25,6 @@ void main (void)
   // 5ms delay to compensate for time to startup between MSP430 and CC1100/2500
   __delay_cycles(5000);
   
-  uartInit();
-  
   TI_CC_SPISetup();                         // Initialize SPI port
 
   TI_CC_PowerupResetCCxxxx();               // Reset CCxxxx
@@ -35,13 +32,13 @@ void main (void)
   TI_CC_SPIWriteBurstReg(TI_CCxxx0_PATABLE, paTable, paTableLen);//Write PATABLE
 
   // Configure ports -- switch inputs, LEDs, GDO0 to RX packet info from CCxxxx
-  TI_CC_SW_PxREN |= TI_CC_SW1;               // Enable Pull up resistor
-  TI_CC_SW_PxOUT |= TI_CC_SW1;               // Enable pull up resistor
-  TI_CC_SW_PxIES |= TI_CC_SW1;               // Int on falling edge
+  TI_CC_SW_PxREN = TI_CC_SW1;               // Enable Pull up resistor
+  TI_CC_SW_PxOUT = TI_CC_SW1;               // Enable pull up resistor
+  TI_CC_SW_PxIES = TI_CC_SW1;               // Int on falling edge
   TI_CC_SW_PxIFG &= ~(TI_CC_SW1);           // Clr flags
-  TI_CC_SW_PxIE |= TI_CC_SW1;                // Activate interrupt enables
-  TI_CC_LED_PxOUT &= ~(TI_CC_LED1); // Outputs = 0
-  TI_CC_LED_PxDIR |= TI_CC_LED1;// LED Direction to Outputs
+  TI_CC_SW_PxIE = TI_CC_SW1;                // Activate interrupt enables
+  TI_CC_LED_PxOUT &= ~(TI_CC_LED1 + TI_CC_LED2); // Outputs = 0
+  TI_CC_LED_PxDIR |= TI_CC_LED1 + TI_CC_LED2;// LED Direction to Outputs
 
   TI_CC_GDO0_PxIES |= TI_CC_GDO0_PIN;       // Int on falling edge (end of pkt)
   TI_CC_GDO0_PxIFG &= ~TI_CC_GDO0_PIN;      // Clear flag
@@ -51,9 +48,7 @@ void main (void)
                                             // When a pkt is received, it will
                                             // signal on GDO0 and wake CPU
 
-  //__bis_SR_register(LPM3_bits + GIE);       // Enter LPM3, enable interrupts
-  __bis_SR_register(LPM0_bits + GIE);       // Enter LPM0, interrupts enabled
-  
+  __bis_SR_register(LPM3_bits + GIE);       // Enter LPM3, enable interrupts
 }
 
 
@@ -61,12 +56,9 @@ void main (void)
 #pragma vector=PORT1_VECTOR
 __interrupt void Port1_ISR (void)
 {
-  
   // If Switch was pressed
   if(TI_CC_SW_PxIFG & TI_CC_SW1)
   {
-    uartWriteString("TX \r\n");
-  
     // Build packet
     txBuffer[0] = 11;                        // Packet length
     txBuffer[1] = 0x01;                     // Packet address
@@ -100,21 +92,12 @@ __interrupt void Port2_ISR(void)
     if (RFReceivePacket(rxBuffer,&len))     // Fetch packet from CCxxxx
     TI_CC_LED_PxOUT ^= rxBuffer[1];         // Toggle LEDs according to pkt data
     
-    if (rxBuffer[2] != 0x00) {
-      
-      uartWriteString("RX \r\n");
-      
-      __delay_cycles(500000);
-      // Send ACK
-      // Build packet
-      txBuffer[0] = 11;                        // Packet length
-      txBuffer[1] = 0x01;                     // Packet address
-      txBuffer[2] = 0xFF;
-      txBuffer[3] = 0x00;
-      RFSendPacket(txBuffer, 12);              // Send value over RF
-      
-      uartWriteString("TX \r\n");
-    }
+    // Send ACK
+    // Build packet
+    txBuffer[0] = 11;                        // Packet length
+    txBuffer[1] = 0x01;                     // Packet address
+    txBuffer[2] = TI_CC_LED1;
+    RFSendPacket(txBuffer, 12);              // Send value over RF
   }
 
   TI_CC_GDO0_PxIFG &= ~TI_CC_GDO0_PIN;      // After pkt RX, this flag is set.
