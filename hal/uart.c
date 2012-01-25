@@ -27,6 +27,14 @@ void uartInit(void)
  
 } 
 
+int putchar(int c)
+{
+    UCA0TXBUF = c; // write c to TX buffer
+    //__delay_cycles(10000); //transmission delay
+    while(!(IFG2&UCA0TXIFG));
+    return c;
+}
+
 void uartWriteString(char *tx_message)
 {
 

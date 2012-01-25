@@ -21,6 +21,10 @@ char txBuffer[12];
 char rxBuffer[12];
 unsigned int i = 0;
 
+//int puts(const char *) { while(*s) putc(*s++); }
+
+
+
 void main (void)
 {
   WDTCTL = WDTPW + WDTHOLD;                 // Stop WDT
@@ -82,10 +86,11 @@ __interrupt void Port1_ISR (void)
     txBuffer[10] = 0x39;
     txBuffer[11] = 0x40;
     
-    char strBuffer [20];
-    sprintf (strBuffer, "TX PKT:%d\r\n", txBuffer[3]);// An example of what we want to show on serial
+    // Using printf isn't very efficient, although if you configure your compiler,
+    // you can maybe use a tiny version of it. Also check out:
+    // http://www.43oh.com/forum/viewtopic.php?f=10&t=1732&hilit=tiny+printf
     
-    uartWriteString(strBuffer);
+    printf("TX PKT:%d\r\n", txBuffer[3]);// An example of what we want to show on serial
           
     RFSendPacket(txBuffer, 12);              // Send value over RF
     __delay_cycles(5000);                   // Switch debounce
@@ -122,13 +127,10 @@ __interrupt void Port2_ISR(void)
           txBuffer[1] = 0x01;                     // Packet address
           txBuffer[2] = 0xFF;
           txBuffer[3] = 0x00;
-          
-          char strBuffer [20];
-          sprintf (strBuffer, "RX PKT:%d\r\n", rxBuffer[2]);// An example of what we want to show on serial
-          
+
           RFSendPacket(txBuffer, 4);              // Send value over RF
-          uartWriteString(strBuffer);
-          uartWriteString("TX ACK\r\n");
+          printf("RX PKT:%d\r\n", rxBuffer[2]);// An example of what we want to show on serial
+          uartWriteString("TX ACK\r\n"); // Similar to printf, but printf probably takes longer
         }
         
      }
