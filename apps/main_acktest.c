@@ -9,9 +9,10 @@
 * goes back to the recipient. (Both devices use the same address). 
 */
 
+#include <stdlib.h>
+#include <stdio.h>
 #include "../ti/include.h"
 #include "../hal/uart.h"
-#include <string.h>
 
 extern char paTable[];
 extern char paTableLen;
@@ -66,7 +67,6 @@ __interrupt void Port1_ISR (void)
   // If Switch was pressed
   if(TI_CC_SW_PxIFG & TI_CC_SW1)
   {
-    uartWriteString("TX PKT\r\n");
   
     // Build packet
     txBuffer[0] = 11;                        // Packet length
@@ -81,6 +81,12 @@ __interrupt void Port1_ISR (void)
     txBuffer[9] = 0x38;
     txBuffer[10] = 0x39;
     txBuffer[11] = 0x40;
+    
+    char strBuffer [20];
+    sprintf (strBuffer, "TX PKT: %d\r\n", txBuffer[3]);// An example of what we want to show on serial
+    
+    uartWriteString(strBuffer);
+          
     RFSendPacket(txBuffer, 12);              // Send value over RF
     __delay_cycles(5000);                   // Switch debounce
   }
@@ -116,8 +122,14 @@ __interrupt void Port2_ISR(void)
           txBuffer[1] = 0x01;                     // Packet address
           txBuffer[2] = 0xFF;
           txBuffer[3] = 0x00;
+          
+          char strBuffer [10];
+          sprintf (strBuffer, "%d", rxBuffer[2]);// An example of what we want to show on serial
+          
           RFSendPacket(txBuffer, 4);              // Send value over RF
-          uartWriteString("RX PKT\r\n");
+          uartWriteString("RX PKT:");
+          uartWriteString(strBuffer);
+          uartWriteString("\r\n");
           uartWriteString("TX ACK\r\n");
         }
         
