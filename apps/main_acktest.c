@@ -83,7 +83,7 @@ __interrupt void Port1_ISR (void)
     txBuffer[11] = 0x40;
     
     char strBuffer [20];
-    sprintf (strBuffer, "TX PKT: %d\r\n", txBuffer[3]);// An example of what we want to show on serial
+    sprintf (strBuffer, "TX PKT:%d\r\n", txBuffer[3]);// An example of what we want to show on serial
     
     uartWriteString(strBuffer);
           
@@ -123,13 +123,11 @@ __interrupt void Port2_ISR(void)
           txBuffer[2] = 0xFF;
           txBuffer[3] = 0x00;
           
-          char strBuffer [10];
-          sprintf (strBuffer, "%d", rxBuffer[2]);// An example of what we want to show on serial
+          char strBuffer [20];
+          sprintf (strBuffer, "RX PKT:%d\r\n", rxBuffer[2]);// An example of what we want to show on serial
           
           RFSendPacket(txBuffer, 4);              // Send value over RF
-          uartWriteString("RX PKT:");
           uartWriteString(strBuffer);
-          uartWriteString("\r\n");
           uartWriteString("TX ACK\r\n");
         }
         
