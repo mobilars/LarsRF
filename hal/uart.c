@@ -27,7 +27,7 @@ void uartInit(void)
  
 } 
 
-int putchar(int c)
+int putc(int c)
 {
     UCA0TXBUF = c; // write c to TX buffer
     //__delay_cycles(10000); //transmission delay
@@ -35,7 +35,7 @@ int putchar(int c)
     return c;
 }
 
-void uartWriteString(char *tx_message)
+void puts(char *tx_message)
 {
 
     unsigned int i=0; //Define end of string loop int

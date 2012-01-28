@@ -9,10 +9,9 @@
 * goes back to the recipient. (Both devices use the same address). 
 */
 
-#include <stdlib.h>
-#include <stdio.h>
 #include "../ti/include.h"
 #include "../hal/uart.h"
+#include "utils.c"
 
 extern char paTable[];
 extern char paTableLen;
@@ -90,7 +89,7 @@ __interrupt void Port1_ISR (void)
     // you can maybe use a tiny version of it. Also check out:
     // http://www.43oh.com/forum/viewtopic.php?f=10&t=1732&hilit=tiny+printf
     
-    printf("TX PKT:%d\r\n", txBuffer[3]);// An example of what we want to show on serial
+    printf("TX PKT:%i\r\n", txBuffer[3]);// An example of what we want to show on serial
           
     RFSendPacket(txBuffer, 12);              // Send value over RF
     __delay_cycles(5000);                   // Switch debounce
@@ -116,7 +115,7 @@ __interrupt void Port2_ISR(void)
            
         if (rxBuffer[1] == 0xFF) 
         {
-          uartWriteString("RX ACK\r\n");
+          puts("RX ACK\r\n");
         }
         else 
         {
@@ -129,8 +128,8 @@ __interrupt void Port2_ISR(void)
           txBuffer[3] = 0x00;
 
           RFSendPacket(txBuffer, 4);              // Send value over RF
-          printf("RX PKT:%d\r\n", rxBuffer[2]);// An example of what we want to show on serial
-          uartWriteString("TX ACK\r\n"); // Similar to printf, but printf probably takes longer
+          printf("RX PKT:%i\r\n", rxBuffer[2]);// An example of what we want to show on serial
+          puts("TX ACK\r\n"); // Similar to printf, but printf probably takes longer
         }
         
      }

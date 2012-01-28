@@ -27,7 +27,7 @@ __interrupt void Port1_ISR (void)
   // If Switch was pressed
   if(P1IFG & BIT3)
   {
-    uartWriteString("Hello... \r\n");
+    puts("Hello... \r\n");
   }
   
   P1IFG &= ~(BIT3);
