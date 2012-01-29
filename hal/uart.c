@@ -27,19 +27,19 @@ void uartInit(void)
  
 } 
 
-int putc(int c)
+void putc(unsigned char c)
 {
     UCA0TXBUF = c; // write c to TX buffer
     //__delay_cycles(10000); //transmission delay
     while(!(IFG2&UCA0TXIFG));
-    return c;
+    return;
 }
 
-void puts(char *tx_message)
+void puts(unsigned char *tx_message)
 {
 
     unsigned int i=0; //Define end of string loop int
-    char *message; // message variable
+    unsigned char *message; // message variable
     unsigned int message_num; // define ascii int version variable
     message = tx_message; // move tx_message into message
     
