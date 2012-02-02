@@ -16,6 +16,6 @@ modifications to the TI-files to make it work with the Launchpad and MSP430G2553
 I am going to make a few test-apps that I will put under the directory /apps
 These test-apps are based on test-code from TI, and are also available as BSD. 
 
-Thanks to CorB for testing and helping out. 
+Thanks to CorB for testing, contributing source code and helping out.
 
 More information about my various projects at http://lars.roland.bz/

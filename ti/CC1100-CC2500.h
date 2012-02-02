@@ -44,3 +44,5 @@
 void writeRFSettings(void);
 void RFSendPacket(char *, char);
 char RFReceivePacket(char *, char *);
+void Radio_GotoSleep();
+void Radio_WakeUp();

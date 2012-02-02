@@ -528,3 +528,27 @@ char RFReceivePacket(char *rxBuffer, char *length)
   else
       return 0;                             // Error
 }
+
+
+// Contributed by Cor
+void Radio_GotoSleep()
+{
+ TI_CC_SPIStrobe(TI_CCxxx0_SIDLE); // set IDLE
+ TI_CC_SPIStrobe(TI_CCxxx0_SPWD); // power down.
+}
+
+// Contributed by Cor
+void Radio_WakeUp()
+{
+  TI_CC_CSn_PxOUT &= ~TI_CC_CSn_PIN;        // /CS low
+  while (TI_CC_SPI_USCIB0_PxIN & TI_CC_SPI_USCIB0_SOMI); //wait till P1.6 goes low
+  TI_CC_CSn_PxOUT |= TI_CC_CSn_PIN;         // /CS high
+
+  // write some test setting back;
+  TI_CC_SPIWriteReg(TI_CCxxx0_TEST2, 0x88); // Various test settings.
+  TI_CC_SPIWriteReg(TI_CCxxx0_TEST1, 0x31); // Various test settings.
+  TI_CC_SPIWriteReg(TI_CCxxx0_TEST0, 0x0B); // Various test settings.
+    
+  TI_CC_SPIStrobe(TI_CCxxx0_SFRX);          // flush the receive FIFO of any residual data
+  TI_CC_SPIStrobe(TI_CCxxx0_SIDLE); // set IDLE
+}
