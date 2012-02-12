@@ -1,3 +1,5 @@
+This is the MSPGCC Branch of the code. It has a different directory structure and content.
+
 This is a simple RF library for TI Launchpad w / RF Boosterpack running MSP430G2553.
 
 I started writing my own library, but then I was told of a TI-library
