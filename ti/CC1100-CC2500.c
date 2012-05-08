@@ -459,16 +459,34 @@ extern char paTableLen = 1;
 //-----------------------------------------------------------------------------
 void RFSendPacket(char *txBuffer, char size)
 {
-  TI_CC_SPIWriteBurstReg(TI_CCxxx0_TXFIFO, txBuffer, size); // Write TX data
-  TI_CC_SPIStrobe(TI_CCxxx0_STX);           // Change state to TX, initiating
-                                            // data transfer
-
-  while (!(TI_CC_GDO0_PxIN&TI_CC_GDO0_PIN));
-                                            // Wait GDO0 to go hi -> sync TX'ed
-  while (TI_CC_GDO0_PxIN&TI_CC_GDO0_PIN);
-                                            // Wait GDO0 to clear -> end of pkt
-  TI_CC_GDO0_PxIFG &= ~TI_CC_GDO0_PIN;      // After pkt TX, this flag is set.
-                                            // Has to be cleared before existing
+//  TI_CC_SPIWriteBurstReg(TI_CCxxx0_TXFIFO, txBuffer, size); // Write TX data
+//  TI_CC_SPIStrobe(TI_CCxxx0_STX);           // Change state to TX, initiating
+//                                            // data transfer
+//
+//  while (!(TI_CC_GDO0_PxIN&TI_CC_GDO0_PIN));
+//                                            // Wait GDO0 to go hi -> sync TX'ed
+//  while (TI_CC_GDO0_PxIN&TI_CC_GDO0_PIN);
+//                                            // Wait GDO0 to clear -> end of pkt
+//  TI_CC_GDO0_PxIFG &= ~TI_CC_GDO0_PIN;      // After pkt TX, this flag is set.
+//                                            // Has to be cleared before existing
+  
+    // added 20120123 based on ANAREN code 
+    TI_CC_SPIStrobe(TI_CCxxx0_SIDLE); // set to IDLE
+    TI_CC_SPIStrobe(TI_CCxxx0_SFRX); // Flush RX
+    TI_CC_SPIStrobe(TI_CCxxx0_SFTX); // Flush TX
+    // end new 20120123
+    
+    TI_CC_SPIWriteBurstReg(TI_CCxxx0_TXFIFO, txBuffer, size); // Write TX packet structure data
+    
+    TI_CC_SPIStrobe(TI_CCxxx0_STX); // Change state to TX, initiating data transfer
+    
+    while (!(TI_CC_GDO0_PxIN&TI_CC_GDO0_PIN)); // Wait GDO0 to go hi -> sync TX'ed
+    while (TI_CC_GDO0_PxIN&TI_CC_GDO0_PIN); // Wait GDO0 to clear -> end of pkt
+    
+    TI_CC_SPIStrobe(TI_CCxxx0_SRX); // Change state to RX after sending
+    
+    TI_CC_GDO0_PxIFG &= ~TI_CC_GDO0_PIN; // After pkt TX, this interrupt flag is set.
+    // Has to be cleared before exiting
 }
 
 
@@ -501,9 +519,9 @@ void RFSendPacket(char *txBuffer, char size)
 //          0x80:  CRC OK
 //          0x00:  CRC NOT OK (or no pkt was put in the RXFIFO due to filtering)
 //-----------------------------------------------------------------------------
-char RFReceivePacket(char *rxBuffer, char *length)
+char RFReceivePacket(char *rxBuffer, char *length, char *status)
 {
-  char status[2];
+  //char status[2];
   char pktLen;
 
   if ((TI_CC_SPIReadStatus(TI_CCxxx0_RXBYTES) & TI_CCxxx0_NUM_RXBYTES))

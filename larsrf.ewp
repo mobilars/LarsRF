@@ -2853,6 +2853,12 @@
         <configuration>Debug</configuration>
       </excluded>
     </file>
+    <file>
+      <name>$PROJ_DIR$\apps\utils.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\apps\utils.h</name>
+    </file>
   </group>
   <group>
     <name>hal</name>
