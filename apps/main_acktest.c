@@ -119,7 +119,7 @@ __interrupt void Port2_ISR(void)
         }
         else 
         {
-          __delay_cycles(500000);
+          //__delay_cycles(500000);
           // Send ACK
           // Build packet
           txBuffer[0] = 3;                        // Packet length
