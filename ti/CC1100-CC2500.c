@@ -282,8 +282,11 @@ void writeRFSettings(void)
 }
 
 // PATABLE (0 dBm output power)
-extern char paTable[] = {0x60};
-extern char paTableLen = 1;
+//extern char paTable[] = {0x60};
+//extern char paTableLen = 1;
+
+extern char paTable[] = {0xC0, 0xC5, 0xCD, 0x86, 0x50, 0x37, 0x26, 0x1D, 0x17}; //+12,10,7,5,0,-6,-10,-15 Dbm default 10Dbm
+extern char paTableLen = 9;
 
 #endif
 
@@ -437,6 +440,47 @@ extern char paTable[] = {0xFB};
 extern char paTableLen = 1;
 
 #endif
+
+
+void RF_init()
+{
+  
+  TI_CC_SPISetup();                         // Initialize SPI port
+  TI_CC_PowerupResetCCxxxx();               // Reset CCxxxx
+  writeRFSettings();                        // Write RF settings to config reg
+  
+  TI_CC_SPIWriteBurstReg(TI_CCxxx0_PATABLE, paTable, paTableLen);//Write PATABLE
+  //TI_CC_SPIStrobe(TI_CCxxx0_SIDLE); // set IDLE
+  TI_CC_SPIWriteReg (TI_CCxxx0_PATABLE,paTable[0]); // init at max powerlevel
+
+  // Configure ports -- switch inputs, LEDs, GDO0 to RX packet info from CCxxxx
+  
+  TI_CC_SW_PxREN |= TI_CC_SW1;               // Enable Pull up resistor
+  TI_CC_SW_PxOUT |= TI_CC_SW1;               // Enable pull up resistor
+  TI_CC_SW_PxIES |= TI_CC_SW1;               // Int on falling edge
+  //TI_CC_SW_PxIFG &= ~(TI_CC_SW1);            // Clr flags
+  TI_CC_SW_PxIFG = 0x00;
+  TI_CC_SW_PxIE |= TI_CC_SW1;                // Activate interrupt enables
+  
+  TI_CC_GDO0_PxIES |= TI_CC_GDO0_PIN;       // Int on falling edge (end of pkt)
+  TI_CC_GDO0_PxIFG &= ~TI_CC_GDO0_PIN;      // Clear flag
+  TI_CC_GDO0_PxIE |= TI_CC_GDO0_PIN;        // Enable int on end of packet
+
+  TI_CC_SPIStrobe(TI_CCxxx0_SRX);           // Initialize CCxxxx in RX mode.
+                                            // When a pkt is received, it will
+                                            // signal on GDO0 and wake CPU
+
+}
+
+void RF_change_Power(char power)
+{
+ if (power<paTableLen)
+  {TI_CC_SPIStrobe(TI_CCxxx0_SIDLE); // set IDLE
+   TI_CC_SPIWriteReg (TI_CCxxx0_PATABLE,paTable[power]);
+   //Out_Payload.Status.power=TI_CC_SPIReadReg(TI_CCxxx0_PATABLE);
+  }
+}
+
 
 
 //-----------------------------------------------------------------------------

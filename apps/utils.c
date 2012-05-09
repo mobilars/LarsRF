@@ -44,7 +44,7 @@ static void puth(unsigned n)
     putc(hex[n & 15]);
 }
 
-void printf(char *format, ...)
+void uartprintf(char *format, ...)
 {
     char c;
     int i;
