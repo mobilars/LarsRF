@@ -191,16 +191,18 @@ void TI_CC_SPIReadBurstReg(char addr, char *buffer, char count)
   TI_CC_CSn_PxOUT &= ~TI_CC_CSn_PIN;        // /CS enable
   while (!(IFG2&UCB0TXIFG));                // Wait for TXBUF ready
   UCB0TXBUF = (addr | TI_CCxxx0_READ_BURST);// Send address
-  while (UCB0STAT & UCBUSY);                // Wait for TX to complete
+  while (!(IFG2&UCB0TXIFG));                // Wait for TX to complete
+  while (!(IFG2&UCB0RXIFG));				// Wait for RX
+  UCB0RXBUF;								// Empty RXBUF
+
   UCB0TXBUF = 0;                            // Dummy write to read 1st data byte
-  // Addr byte is now being TX'ed, with dummy byte to follow immediately after
-  IFG2 &= ~UCB0RXIFG;                       // Clear flag
-  while (!(IFG2&UCB0RXIFG));                // Wait for end of 1st data byte TX
-  // First data byte now in RXBUF
+  while (!(IFG2&UCB0TXIFG));                // Wait for TX to complete
+  while (!(IFG2&UCB0RXIFG));				// Wait for RX
+
   for (i = 0; i < (count-1); i++)
   {
-    UCB0TXBUF = 0;                          //Initiate next data RX, meanwhile..
     buffer[i] = UCB0RXBUF;                  // Store data from last data RX
+	UCB0TXBUF = 0;                          // Initiate next data RX
     while (!(IFG2&UCB0RXIFG));              // Wait for RX to finish
   }
   buffer[count-1] = UCB0RXBUF;              // Store last RX byte in buffer
